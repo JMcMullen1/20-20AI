@@ -4,8 +4,8 @@ A 20/20-branded chat page for the APM AI certificate courses, running on the Cla
 
 ## Course links
 
-- AI Awareness for Project Professionals: `https://YOUR-APP.onrender.com/?course=awareness`
-- Working with AI in Project Teams: `https://YOUR-APP.onrender.com/?course=teams`
+- AI Awareness for Project Professionals: `https://two0-20ai.onrender.com/?course=awareness`
+- Working with AI in Project Teams: `https://two0-20ai.onrender.com/?course=teams`
 
 ## Settings (environment variables)
 
@@ -43,7 +43,7 @@ The server does not store conversations. Check Anthropic's data terms with your 
 To rebuild them for your Render address:
 
 ```
-python3 pod/build.py https://YOUR-APP.onrender.com
+python3 pod/build.py https://two0-20ai.onrender.com
 ```
 
 In a meeting room (as host): **Pods → Share → Share Document**, upload the `.pod` file, then drag the pod to the size you want. Upload it to the Content library to reuse it across rooms and breakouts.

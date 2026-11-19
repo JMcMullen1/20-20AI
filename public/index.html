@@ -15,6 +15,14 @@
   header .t { flex:1; min-width:0; }
   header h1 { margin:0; font-size:20px; letter-spacing:.2px; }
   header .sub { color:var(--soft); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .switch { display:flex; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.25); border-radius:22px; padding:3px; gap:2px; }
+  .switch button { background:none; border:0; color:var(--soft); font:inherit; font-size:14px; font-weight:bold; padding:6px 14px; border-radius:18px; cursor:pointer; white-space:nowrap; }
+  .switch button:hover { color:#fff; }
+  .switch button[aria-pressed="true"] { background:#fff; color:var(--navy); }
+  .confirm { display:flex; flex-wrap:wrap; align-items:center; gap:10px; background:var(--pale); border-bottom:1px solid var(--gold); padding:8px 18px; font-size:15px; }
+  .confirm[hidden] { display:none; }
+  .confirm button { font:inherit; font-size:14px; border-radius:6px; padding:5px 12px; cursor:pointer; border:1px solid var(--navy); background:#fff; color:var(--navy); }
+  .confirm button.go { background:var(--navy); color:#fff; }
   header .case { background:var(--gold); color:var(--navy); font-weight:bold; font-size:12px; padding:4px 10px; border-radius:20px; white-space:nowrap; }
   .tools { display:flex; gap:8px; padding:8px 18px; background:#fff; border-bottom:1px solid var(--soft); flex-wrap:wrap; }
   .tools button { background:#fff; border:1px solid var(--soft); color:var(--navy); border-radius:6px; padding:6px 12px; font:inherit; font-size:14px; cursor:pointer; }
@@ -23,7 +31,8 @@
   main { flex:1; overflow-y:auto; padding:18px; }
   .wrap { max-width:860px; margin:0 auto; }
   .msg { display:flex; margin:10px 0; }
-  .msg .b { padding:10px 14px; border-radius:12px; max-width:85%; line-height:1.45; white-space:normal; word-wrap:break-word; }
+  .msg > div { max-width:85%; min-width:0; }
+  .msg .b { padding:10px 14px; border-radius:12px; line-height:1.45; white-space:normal; word-wrap:break-word; }
   .msg.user { justify-content:flex-end; }
   .msg.user .b { background:var(--navy); color:#fff; border-bottom-right-radius:3px; }
   .msg.ai .b { background:#fff; border:1px solid var(--soft); border-left:4px solid var(--cyan); border-bottom-left-radius:3px; }
@@ -53,7 +62,8 @@
   .gate button { margin-top:12px; width:100%; }
   .gate .err { color:var(--red); min-height:20px; margin-top:8px; font-size:14px; }
   .typing { color:var(--dim); font-style:italic; }
-  @media (max-width:600px) { header .case { display:none; } .note { display:none; } .msg .b { max-width:95%; } }
+  @media (max-width:700px) { header { flex-wrap:wrap; } header .t { flex-basis:calc(100% - 60px); } .switch { order:3; } header .case { order:4; } }
+  @media (max-width:600px) { .note { display:none; } .msg > div { max-width:95%; } }
 </style>
 </head>
 <body>
@@ -61,8 +71,10 @@
   <img src="logo.png" alt="20/20">
   <div class="t"><h1 id="app">20/20 Course AI</h1><div class="sub" id="course">Loading…</div></div>
   <span class="demo" id="demo" hidden>Demo</span>
+  <div class="switch" role="group" aria-label="Case study" id="switch"></div>
   <span class="case" id="case"></span>
 </header>
+<div class="confirm" id="confirm" hidden><span id="confirmText"></span><button class="go" id="confirmGo">Switch and clear chat</button><button id="confirmNo">Cancel</button></div>
 <div class="tools">
   <button id="new">New chat</button>
   <button id="copy">Copy chat</button>
@@ -81,11 +93,14 @@
   <input id="code" autocomplete="off" aria-label="Access code"><button class="send" id="enter">Start</button><div class="err" id="err"></div>
 </div></div>
 <script>
-const qs = new URLSearchParams(location.search);
-const COURSE = qs.get('course') === 'teams' ? 'teams' : 'awareness';
 const $ = id => document.getElementById(id);
-let cfg = null, history = [], busy = false;
+const KEYS = ['awareness', 'teams'];
 const store = { get(k) { try { return sessionStorage.getItem(k); } catch { return null; } }, set(k, v) { try { sessionStorage.setItem(k, v); } catch {} } };
+const saved = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+// The URL wins, then the last choice on this device, then Harrowfield.
+const fromUrl = new URLSearchParams(location.search).get('course');
+let COURSE = KEYS.includes(fromUrl) ? fromUrl : KEYS.includes(saved.get('course')) ? saved.get('course') : 'awareness';
+let cfg = null, history = [], busy = false, pending = null;
 let code = store.get('code') || '';
 
 // Checks for things that look like real personal or confidential details.
@@ -153,6 +168,29 @@ async function send(confirmed) {
   } catch (e) { b.innerHTML = `<span style="color:var(--red)">${esc(e.message)}</span>`; history.pop(); }
   busy = false; $('send').disabled = false; $('input').focus();
 }
+async function loadCourse(key) {
+  COURSE = key; saved.set('course', key);
+  try { const u = new URL(location.href); u.searchParams.set('course', key); history_replace(u); } catch {}
+  cfg = await (await fetch('/api/config?course=' + key)).json();
+  document.title = cfg.appName; $('app').textContent = cfg.appName;
+  $('course').textContent = 'APM Certificate · ' + cfg.course; $('case').textContent = 'Case: ' + cfg.caseName;
+  $('demo').hidden = !cfg.demo;
+  $('switch').innerHTML = '';
+  cfg.courses.forEach(c => {
+    const b = document.createElement('button'); b.textContent = c.short; b.title = c.label;
+    b.setAttribute('aria-pressed', c.key === key ? 'true' : 'false');
+    b.onclick = () => askSwitch(c); $('switch').appendChild(b);
+  });
+  history = []; hello();
+}
+function history_replace(u) { window.history.replaceState(null, '', u); }
+function askSwitch(c) {
+  if (c.key === COURSE || busy) return;
+  if (!history.length) return loadCourse(c.key);
+  pending = c.key; $('confirmText').textContent = `Switch to ${c.caseName}? This clears the current chat.`; $('confirm').hidden = false;
+}
+$('confirmGo').onclick = () => { $('confirm').hidden = true; if (pending) loadCourse(pending); pending = null; };
+$('confirmNo').onclick = () => { $('confirm').hidden = true; pending = null; };
 function transcript() { return `${cfg.appName} · ${cfg.course} · ${cfg.caseName}\n${new Date().toLocaleString('en-GB')}\n\n` + history.map(m => `${m.role === 'user' ? 'YOU' : 'AI'}:\n${m.content}\n`).join('\n'); }
 function grow() { const t = $('input'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 180) + 'px'; }
 function showGate() { $('gate').style.display = 'flex'; $('code').focus(); }
@@ -163,14 +201,12 @@ async function tryCode() {
 $('send').onclick = () => send();
 $('input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
 $('input').addEventListener('input', grow);
-$('new').onclick = () => { history = []; hello(); };
+$('new').onclick = () => { history = []; $('confirm').hidden = true; hello(); };
 $('copy').onclick = async () => { try { await navigator.clipboard.writeText(transcript()); $('copy').textContent = 'Copied'; setTimeout(() => $('copy').textContent = 'Copy chat', 1500); } catch { alert('Copy is blocked here. Use Download chat instead.'); } };
 $('save').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([transcript()], { type: 'text/plain' })); a.download = '2020-course-ai-chat.txt'; a.click(); };
 $('enter').onclick = tryCode; $('code').addEventListener('keydown', e => { if (e.key === 'Enter') tryCode(); });
 (async () => {
-  cfg = await (await fetch('/api/config?course=' + COURSE)).json();
-  document.title = cfg.appName; $('app').textContent = cfg.appName; $('course').textContent = 'APM Certificate · ' + cfg.course; $('case').textContent = cfg.caseName;
-  $('demo').hidden = !cfg.demo; hello();
+  await loadCourse(COURSE);
   if (cfg.needsCode) { const r = await fetch('/api/check', { method: 'POST', headers: { 'X-Access-Code': code } }); if (!r.ok) showGate(); }
 })();
 </script>

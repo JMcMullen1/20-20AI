@@ -55,7 +55,8 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'GET' && url.pathname === '/api/config') {
       const c = courses[url.searchParams.get('course')] || courses.awareness;
-      return send(res, 200, { appName: APP_NAME, course: c.label, caseName: c.caseName, starters: c.starters, needsCode: !!ACCESS_CODE, demo: MOCK });
+      const list = Object.entries(courses).map(([key, x]) => ({ key, label: x.label, caseName: x.caseName, short: x.short }));
+      return send(res, 200, { appName: APP_NAME, course: c.label, caseName: c.caseName, starters: c.starters, courses: list, needsCode: !!ACCESS_CODE, demo: MOCK });
     }
     if (req.method === 'POST' && url.pathname === '/api/check') {
       return send(res, codeOk(req) ? 200 : 401, { ok: codeOk(req) });
