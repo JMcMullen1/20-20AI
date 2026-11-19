@@ -35,3 +35,15 @@ A 20/20-branded chat page for the APM AI certificate courses, running on the Cla
 - `render.yaml`: Render setup. `Dockerfile`: for container hosts.
 
 The server does not store conversations. Check Anthropic's data terms with your IT and data protection leads before launch.
+
+## Adobe Connect pod
+
+`pod/dist/` holds one pod per course. Each shows the live app inside a Share pod, so the pod and the website are always the same.
+
+To rebuild them for your Render address:
+
+```
+python3 pod/build.py https://YOUR-APP.onrender.com
+```
+
+In a meeting room (as host): **Pods → Share → Share Document**, upload the `.pod` file, then drag the pod to the size you want. Upload it to the Content library to reuse it across rooms and breakouts.

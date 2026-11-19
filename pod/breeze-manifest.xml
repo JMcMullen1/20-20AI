@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<breeze-manifest version="1.0" xmlns="http://breeze.macromedia.com/ns/breezemanifest" generator="ZB">
+  <document type="custom-pod" id="com.twentytwentypm.courseai.__COURSE__" version="1.0.000" minimumConnectMobileVersion="2.4" minimumSDKversion="11.2.000" minimumConnectServerVersion="11.2.0"/>
+  <assets>
+    <asset type="document-view">
+      <entry href="CustomPod.htm" href-html5="CustomPod.htm" />
+      <file href="CustomPod.htm"/>
+    </asset>
+  </assets>
+</breeze-manifest>
