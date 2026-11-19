@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: 2020-course-ai
+    runtime: node
+    plan: starter
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/config
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ACCESS_CODE
+        sync: false
+      - key: MODEL
+        value: claude-opus-5-5
+      - key: EFFORT
+        value: low
+      - key: MAX_TOKENS
+        value: "4000"
+      - key: PER_MINUTE
+        value: "12"
+      - key: DAILY_CAP
+        value: "1500"

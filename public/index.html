@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>20/20 Course AI</title>
+<link rel="icon" href="logo.png">
+<style>
+  :root { --navy:#1E2945; --red:#F4313F; --cyan:#00B0F0; --light:#E6F7FE; --gold:#FFC000; --pale:#FFF2CC; --soft:#C9D3E6; --dim:#5C6A8A; --bg:#F4F7FB; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; margin:0; }
+  body { font-family: Calibri, Carlito, "Segoe UI", Arial, sans-serif; background:var(--bg); color:var(--navy); display:flex; flex-direction:column; font-size:16px; }
+  header { background:var(--navy); color:#fff; display:flex; align-items:center; gap:14px; padding:12px 18px; border-bottom:4px solid var(--red); }
+  header img { height:44px; }
+  header .t { flex:1; min-width:0; }
+  header h1 { margin:0; font-size:20px; letter-spacing:.2px; }
+  header .sub { color:var(--soft); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  header .case { background:var(--gold); color:var(--navy); font-weight:bold; font-size:12px; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+  .tools { display:flex; gap:8px; padding:8px 18px; background:#fff; border-bottom:1px solid var(--soft); flex-wrap:wrap; }
+  .tools button { background:#fff; border:1px solid var(--soft); color:var(--navy); border-radius:6px; padding:6px 12px; font:inherit; font-size:14px; cursor:pointer; }
+  .tools button:hover { border-color:var(--cyan); }
+  header .demo { background:var(--red); color:#fff; font-weight:bold; font-size:12px; padding:4px 10px; border-radius:20px; }
+  main { flex:1; overflow-y:auto; padding:18px; }
+  .wrap { max-width:860px; margin:0 auto; }
+  .msg { display:flex; margin:10px 0; }
+  .msg .b { padding:10px 14px; border-radius:12px; max-width:85%; line-height:1.45; white-space:normal; word-wrap:break-word; }
+  .msg.user { justify-content:flex-end; }
+  .msg.user .b { background:var(--navy); color:#fff; border-bottom-right-radius:3px; }
+  .msg.ai .b { background:#fff; border:1px solid var(--soft); border-left:4px solid var(--cyan); border-bottom-left-radius:3px; }
+  .msg.ai .b p { margin:0 0 8px; } .msg.ai .b p:last-child { margin:0; }
+  .msg.ai .b ul, .msg.ai .b ol { margin:4px 0 8px; padding-left:22px; }
+  .who { font-size:11px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; color:var(--dim); margin:0 4px 3px; }
+  .hello { background:#fff; border:1px solid var(--soft); border-radius:12px; padding:18px 20px; }
+  .hello h2 { margin:0 0 10px; font-size:20px; }
+  .hello p { margin:0 0 10px; color:#33405e; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .chip { background:var(--light); border:1px solid var(--cyan); color:var(--navy); border-radius:18px; padding:7px 12px; font:inherit; font-size:14px; cursor:pointer; text-align:left; }
+  .chip:hover { background:#d3f0fc; }
+  .warn { background:var(--pale); border:1px solid var(--gold); border-left:5px solid var(--gold); border-radius:8px; padding:10px 14px; margin:10px 0; font-size:15px; }
+  .warn b { color:var(--red); }
+  .warn .acts { margin-top:8px; display:flex; gap:8px; }
+  .warn button { font:inherit; font-size:14px; border-radius:6px; padding:6px 12px; cursor:pointer; border:1px solid var(--navy); background:#fff; color:var(--navy); }
+  .warn button.go { background:var(--navy); color:#fff; }
+  footer { background:#fff; border-top:1px solid var(--soft); padding:10px 18px 12px; }
+  .row { max-width:860px; margin:0 auto; display:flex; gap:10px; align-items:flex-end; }
+  textarea { flex:1; resize:none; font:inherit; font-size:16px; padding:10px 12px; border:1.5px solid var(--soft); border-radius:10px; min-height:48px; max-height:180px; color:var(--navy); }
+  textarea:focus { outline:none; border-color:var(--cyan); }
+  .send { background:var(--red); color:#fff; border:0; border-radius:10px; padding:0 22px; height:48px; font:inherit; font-weight:bold; font-size:16px; cursor:pointer; }
+  .send:disabled { opacity:.5; cursor:default; }
+  .note { max-width:860px; margin:6px auto 0; font-size:12.5px; color:var(--dim); }
+  .gate { position:fixed; inset:0; background:var(--navy); display:none; align-items:center; justify-content:center; padding:20px; z-index:5; }
+  .gate .box { background:#fff; border-radius:14px; padding:26px; width:100%; max-width:380px; text-align:center; border-top:6px solid var(--red); }
+  .gate img { height:64px; background:var(--navy); border-radius:10px; padding:6px; }
+  .gate h2 { margin:12px 0 4px; } .gate p { color:var(--dim); margin:0 0 14px; }
+  .gate input { width:100%; font:inherit; font-size:18px; padding:10px; border:1.5px solid var(--soft); border-radius:8px; text-align:center; letter-spacing:2px; }
+  .gate button { margin-top:12px; width:100%; }
+  .gate .err { color:var(--red); min-height:20px; margin-top:8px; font-size:14px; }
+  .typing { color:var(--dim); font-style:italic; }
+  @media (max-width:600px) { header .case { display:none; } .note { display:none; } .msg .b { max-width:95%; } }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="20/20">
+  <div class="t"><h1 id="app">20/20 Course AI</h1><div class="sub" id="course">Loading…</div></div>
+  <span class="demo" id="demo" hidden>Demo</span>
+  <span class="case" id="case"></span>
+</header>
+<div class="tools">
+  <button id="new">New chat</button>
+  <button id="copy">Copy chat</button>
+  <button id="save">Download chat</button>
+</div>
+<main id="main"><div class="wrap" id="log"></div></main>
+<footer>
+  <div class="row">
+    <textarea id="input" rows="1" placeholder="Type your prompt…" aria-label="Your message"></textarea>
+    <button class="send" id="send">Send</button>
+  </div>
+  <div class="note">Training use only. Use the fictional case study and check what the AI tells you.</div>
+</footer>
+<div class="gate" id="gate"><div class="box">
+  <img src="logo.png" alt="20/20"><h2>Course access</h2><p>Enter your course code.</p>
+  <input id="code" autocomplete="off" aria-label="Access code"><button class="send" id="enter">Start</button><div class="err" id="err"></div>
+</div></div>
+<script>
+const qs = new URLSearchParams(location.search);
+const COURSE = qs.get('course') === 'teams' ? 'teams' : 'awareness';
+const $ = id => document.getElementById(id);
+let cfg = null, history = [], busy = false;
+const store = { get(k) { try { return sessionStorage.getItem(k); } catch { return null; } }, set(k, v) { try { sessionStorage.setItem(k, v); } catch {} } };
+let code = store.get('code') || '';
+
+// Checks for things that look like real personal or confidential details.
+const RISKY = [
+  [/[\w.+-]+@[\w-]+\.[\w.]+/, 'an email address'],
+  [/(\+44\s?|\b0)\d{2,4}[\s-]?\d{3,4}[\s-]?\d{3,4}\b/, 'a phone number'],
+  [/\b[A-CEGHJ-PR-TW-Z]{2}\s?\d{2}\s?\d{2}\s?\d{2}\s?[A-D]\b/i, 'a National Insurance number'],
+  [/\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i, 'a postcode'],
+  [/\b(?:\d[ -]?){13,19}\b/, 'a card or account number'],
+  [/\b(date of birth|DOB|home address|salary|medical|diagnosis|sick note|password)\b/i, 'personal or sensitive details'],
+  [/\b(confidential|commercial[- ]in[- ]confidence|restricted)\b/i, 'something labelled confidential or restricted'],
+];
+function risky(t) { const hit = RISKY.find(([re]) => re.test(t)); return hit ? hit[1] : null; }
+
+function esc(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function md(t) {
+  const lines = esc(t).split('\n'); let html = '', list = null;
+  const inline = s => s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|\W)\*(?!\s)(.+?)\*(?=\W|$)/g, '$1<i>$2</i>');
+  for (const raw of lines) {
+    const l = raw.trimEnd(), b = l.match(/^\s*[-•*]\s+(.*)/), n = l.match(/^\s*\d+[.)]\s+(.*)/);
+    const want = b ? 'ul' : n ? 'ol' : null;
+    if (list && want !== list) { html += `</${list}>`; list = null; }
+    if (want) { if (!list) { html += `<${want}>`; list = want; } html += `<li>${inline((b || n)[1])}</li>`; }
+    else if (/^#{1,4}\s/.test(l)) html += `<p><b>${inline(l.replace(/^#+\s/, ''))}</b></p>`;
+    else if (l.trim()) html += `<p>${inline(l)}</p>`;
+  }
+  return html + (list ? `</${list}>` : '');
+}
+function add(role, text) {
+  const d = document.createElement('div'); d.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
+  const inner = document.createElement('div');
+  inner.innerHTML = `<div class="who">${role === 'user' ? 'You' : esc(cfg.appName)}</div><div class="b"></div>`;
+  d.appendChild(inner); $('log').appendChild(d);
+  const b = inner.querySelector('.b'); role === 'user' ? (b.textContent = text) : (b.innerHTML = md(text));
+  scroll(); return b;
+}
+function scroll() { $('main').scrollTop = $('main').scrollHeight; }
+function hello() {
+  $('log').innerHTML = '';
+  const h = document.createElement('div'); h.className = 'hello';
+  h.innerHTML = `<h2>How can I help with ${esc(cfg.caseName)}?</h2><div class="chips"></div>`;
+  cfg.starters.forEach(s => { const c = document.createElement('button'); c.className = 'chip'; c.textContent = s; c.onclick = () => { $('input').value = s; send(); }; h.querySelector('.chips').appendChild(c); });
+  $('log').appendChild(h);
+}
+function warn(text, what) {
+  const w = document.createElement('div'); w.className = 'warn';
+  w.innerHTML = `<b>Check before you send.</b> This looks like ${esc(what)}. Use fictional case details only.<div class="acts"><button class="go">Send anyway</button><button class="edit">Edit</button></div>`;
+  $('log').appendChild(w); scroll();
+  w.querySelector('.go').onclick = () => { w.remove(); send(true); };
+  w.querySelector('.edit').onclick = () => { w.remove(); $('input').focus(); };
+}
+async function send(confirmed) {
+  const text = $('input').value.trim(); if (!text || busy) return;
+  if (!confirmed) { const r = risky(text); if (r) return warn(text, r); }
+  $('input').value = ''; grow(); busy = true; $('send').disabled = true;
+  document.querySelector('.hello')?.remove();
+  add('user', text); history.push({ role: 'user', content: text });
+  const b = add('assistant', ''); b.innerHTML = '<span class="typing">…</span>';
+  let out = '';
+  try {
+    const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Access-Code': code }, body: JSON.stringify({ course: COURSE, messages: history }) });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); if (r.status === 401) showGate(); throw new Error(e.error || 'Something went wrong.'); }
+    const rd = r.body.getReader(), dec = new TextDecoder();
+    for (;;) { const { value, done } = await rd.read(); if (done) break; out += dec.decode(value, { stream: true }); b.innerHTML = md(out); scroll(); }
+    history.push({ role: 'assistant', content: out });
+  } catch (e) { b.innerHTML = `<span style="color:var(--red)">${esc(e.message)}</span>`; history.pop(); }
+  busy = false; $('send').disabled = false; $('input').focus();
+}
+function transcript() { return `${cfg.appName} · ${cfg.course} · ${cfg.caseName}\n${new Date().toLocaleString('en-GB')}\n\n` + history.map(m => `${m.role === 'user' ? 'YOU' : 'AI'}:\n${m.content}\n`).join('\n'); }
+function grow() { const t = $('input'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 180) + 'px'; }
+function showGate() { $('gate').style.display = 'flex'; $('code').focus(); }
+async function tryCode() {
+  const c = $('code').value.trim(); const r = await fetch('/api/check', { method: 'POST', headers: { 'X-Access-Code': c } });
+  if (r.ok) { code = c; store.set('code', c); $('gate').style.display = 'none'; $('input').focus(); } else $('err').textContent = "That code didn't work. Check it with your trainer.";
+}
+$('send').onclick = () => send();
+$('input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+$('input').addEventListener('input', grow);
+$('new').onclick = () => { history = []; hello(); };
+$('copy').onclick = async () => { try { await navigator.clipboard.writeText(transcript()); $('copy').textContent = 'Copied'; setTimeout(() => $('copy').textContent = 'Copy chat', 1500); } catch { alert('Copy is blocked here. Use Download chat instead.'); } };
+$('save').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([transcript()], { type: 'text/plain' })); a.download = '2020-course-ai-chat.txt'; a.click(); };
+$('enter').onclick = tryCode; $('code').addEventListener('keydown', e => { if (e.key === 'Enter') tryCode(); });
+(async () => {
+  cfg = await (await fetch('/api/config?course=' + COURSE)).json();
+  document.title = cfg.appName; $('app').textContent = cfg.appName; $('course').textContent = 'APM Certificate · ' + cfg.course; $('case').textContent = cfg.caseName;
+  $('demo').hidden = !cfg.demo; hello();
+  if (cfg.needsCode) { const r = await fetch('/api/check', { method: 'POST', headers: { 'X-Access-Code': code } }); if (!r.ok) showGate(); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "2020-course-ai",
+  "version": "1.0.0",
+  "description": "20/20 Project Management course AI assistant for APM AI certificate breakouts",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0"
+  }
+}
