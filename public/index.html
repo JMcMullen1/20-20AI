@@ -31,11 +31,8 @@
   .msg.ai .b ul, .msg.ai .b ol { margin:4px 0 8px; padding-left:22px; }
   .who { font-size:11px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; color:var(--dim); margin:0 4px 3px; }
   .hello { background:#fff; border:1px solid var(--soft); border-radius:12px; padding:18px 20px; }
-  .hello h2 { margin:0 0 10px; font-size:20px; }
+  .hello h2 { margin:0; font-size:20px; }
   .hello p { margin:0 0 10px; color:#33405e; }
-  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
-  .chip { background:var(--light); border:1px solid var(--cyan); color:var(--navy); border-radius:18px; padding:7px 12px; font:inherit; font-size:14px; cursor:pointer; text-align:left; }
-  .chip:hover { background:#d3f0fc; }
   .warn { background:var(--pale); border:1px solid var(--gold); border-left:5px solid var(--gold); border-radius:8px; padding:10px 14px; margin:10px 0; font-size:15px; }
   .warn b { color:var(--red); }
   .warn .acts { margin-top:8px; display:flex; gap:8px; }
@@ -129,8 +126,7 @@ function scroll() { $('main').scrollTop = $('main').scrollHeight; }
 function hello() {
   $('log').innerHTML = '';
   const h = document.createElement('div'); h.className = 'hello';
-  h.innerHTML = `<h2>How can I help with ${esc(cfg.caseName)}?</h2><div class="chips"></div>`;
-  cfg.starters.forEach(s => { const c = document.createElement('button'); c.className = 'chip'; c.textContent = s; c.onclick = () => { $('input').value = s; send(); }; h.querySelector('.chips').appendChild(c); });
+  h.innerHTML = `<h2>How can I help with ${esc(cfg.caseName)}?</h2>`;
   $('log').appendChild(h);
 }
 function warn(text, what) {
